@@ -1,0 +1,12 @@
+# Campus Radar
+
+> Independent student-built University of Michigan opportunity discovery.
+
+Research, scholarships and internships matched to student goals. Beta coverage is limited and qualifications require checking with the original publisher.
+
+## Public information
+- [Product and access guide](https://campus-radar-umich.aswelltoo.chatgpt.site/docs): Coverage, privacy, sign-in and agent access boundaries.
+- [Privacy](https://campus-radar-umich.aswelltoo.chatgpt.site/privacy): Personal information and controls.
+- [Student setup](https://campus-radar-umich.aswelltoo.chatgpt.site/beta): Requires the student's own sign-in.
+
+Personal profiles, reports, forwarded email and administrator tools are private. No anonymous personal-data API is offered.

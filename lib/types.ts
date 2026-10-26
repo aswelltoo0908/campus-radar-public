@@ -1,0 +1,203 @@
+export type BetaProfileInput = {
+  reportLanguage: "en" | "zh";
+  deliveryEmail: string;
+  emailDeliveryEnabled: boolean;
+  forwardingEnabled?: boolean;
+  isUmichStudent: boolean;
+  universityName?: string;
+  school: string;
+  major: string;
+  graduationYear: string;
+  academicLevel: "undergraduate" | "graduate";
+  goals: string[];
+  interests: string[];
+  roleTracks: string[];
+  careerStage: "exploring" | "preparing" | "applying" | "interviewing" | "deciding";
+  bottleneck: "direction" | "finding" | "resume" | "networking" | "applications" | "interviews" | "time";
+  customGoal?: string;
+  customInterest?: string;
+  googleCalendarFeedUrl?: string;
+  courseScheduleText?: string;
+  assignmentDeadlinesText?: string;
+  keepManualAcademicData?: boolean;
+  sponsorship: "needed" | "not_needed" | "unsure";
+  paidOnly: boolean;
+  deliveryTime: string;
+  weekends: boolean;
+  canvasFeedUrl?: string;
+  canvasIcsText?: string;
+  canvasBaseUrl?: string;
+  canvasApiToken?: string;
+  opportunityPreferences?: OpportunityPreferences;
+};
+
+export const BUSINESS_CHANNELS = ["finance", "accounting", "entrepreneurship", "marketing", "management", "business_analytics"] as const;
+export type BusinessChannel = typeof BUSINESS_CHANNELS[number];
+export type OpportunityPreferences = {
+  universityName?: string;
+  visa: "f1" | "j1" | "us_citizen_or_pr" | "other" | "unknown";
+  citizenshipRegion: "asia" | "africa" | "other" | "unknown";
+  transferStudent: "yes" | "no" | "unknown";
+  stem: "yes" | "no" | "unknown";
+  newsEnabled: boolean;
+  newsChannels: BusinessChannel[];
+  aiNewsEnabled: boolean;
+  externalEventsEnabled: boolean;
+};
+export type SourceVerification = {
+  status: "reachable" | "feed_verified" | "login_required" | "blocked" | "not_found" | "unavailable" | "needs_review" | "expired" | "closed" | "unsupported";
+  checkedAt: string;
+  httpStatus: number | null;
+  finalUrl: string | null;
+  reason: string;
+  sourceDeadline?: string | null;
+};
+export type PublicSignal = {
+  id: string;
+  category: "research" | "scholarship" | "internship" | "event" | "business_news" | "ai_news";
+  channel: BusinessChannel | null;
+  title: string;
+  summary: string;
+  url: string;
+  sourceId: string;
+  sourceName: string;
+  publishedAt: string | null;
+  fetchedAt: string;
+  verifiedAt: string | null;
+  deadline: string | null;
+  opensAt: string | null;
+  amount: string | null;
+  availability: "open" | "upcoming" | "closed" | "directory" | "needs_review";
+  eligibility: {
+    umichOnly?: boolean;
+    academicLevel?: "undergraduate" | "graduate";
+    visas?: OpportunityPreferences["visa"][];
+    citizenshipRegions?: OpportunityPreferences["citizenshipRegion"][];
+    transferOnly?: boolean;
+    stemPreferred?: boolean;
+    school?: string;
+    otherRequirements: string[];
+  };
+  topics: string[];
+  contentHash: string;
+  sourcePageHash?: string;
+  attributionUrl?: string;
+  discoveredAt?: string;
+  originalSourceName?: string;
+  originalTitle?: string;
+  sourceMode?: "live" | "verified_snapshot";
+  evidenceText?: string;
+  verification?: SourceVerification;
+};
+export type OpportunityMatch = PublicSignal & {
+  why: string;
+  nextAction: string;
+  eligibilityStatus: "potential_match" | "needs_confirmation";
+  unknownConditions: string[];
+  score: number;
+};
+
+export type RadarItem = {
+  id: string;
+  title: string;
+  why: string;
+  nextAction: string;
+  when: string | null;
+  location: string | null;
+  url: string | null;
+  source: string;
+  confidence: "confirmed" | "inferred" | "needs_verification";
+  score: number;
+  campusScope?: "umich";
+  kind?: "career_event" | "event";
+  registrationUrl?: string | null;
+  sourceMode?: "live" | "verified_snapshot";
+  reviewedAt?: string;
+  verification?: SourceVerification;
+};
+
+export type CareerEventSnapshot = {
+  id: string; title: string; url: string; when: string; location: string; reviewedAt: string;
+  summary: { en: string; zh: string };
+  keywords: string[];
+};
+
+export type CareerJob = {
+  id: string;
+  title: string;
+  company: string;
+  url: string;
+  source: "Interstride" | "Employer careers";
+  sourceMode: "verified_snapshot" | "live";
+  reviewedAt: string;
+  paid?: boolean;
+  verification?: SourceVerification;
+  status: "open" | "closed" | "needs_review";
+  summary: { en: string; zh: string };
+  location: string;
+  workMode: "remote" | "hybrid" | "in_office" | "unspecified";
+  startsAt: string | null;
+  deadline: string | null;
+  academicLevels: BetaProfileInput["academicLevel"][];
+  keywords: string[];
+  roleTracks: string[];
+  sponsorship: "explicit_role" | "cpt_opt_and_fulltime" | "history_only" | "unknown" | "not_offered";
+  sponsorshipEvidence: { en: string; zh: string };
+  requirements: { en: string[]; zh: string[] };
+};
+export type CareerJobMatch = CareerJob & { why: string; nextAction: string; score: number; checks: string[]; sponsorshipLabel: string };
+
+export type ResearchLabMatch = {
+  id: string;
+  name: string;
+  department: string;
+  areas: string[];
+  status: "explicitly_recruiting" | "official_undergrad_pathway" | "contact_to_confirm";
+  statusLabel: string;
+  why: string;
+  nextAction: string;
+  url: string;
+  verifiedAt: string;
+  score: number;
+  verification?: SourceVerification;
+};
+
+export type RadarPreview = {
+  aihotOptIn?: boolean;
+  aihotRefs?: {id:string;contentHash:string;why:string;nextAction:string;score:number}[];
+  aihotStatus?: {status:"off"|"disabled"|"ready"|"unavailable";checkedAt:string|null;expiresAt:string|null;note:string};
+  sourceChecks?: { policyVersion: 1; checkedAt: string; withheld: { id: string; title: string; url: string | null; verification: SourceVerification }[] };
+  formatVersion?: number;
+  emailUpdates?: Pick<RadarPreview, "scholarships" | "businessNews" | "aiNews" | "externalEvents" | "researchLabs" | "opportunities" | "careerJobs" | "umichCareerEvents" | "campusEvents" | "aihotRefs">;
+  campusEvents?: RadarItem[];
+  discoveryStatus?: {
+    campus: { status: "live" | "unavailable" | "not_enabled"; checkedAt: string; matched: number; error?: string };
+    careers: { checkedAt: string; candidates: number; matched: number; paidOnly?: boolean; sources: { name: string; status: "live" | "unavailable"; count: number; error?: string }[] };
+  };
+  careerJobs?: CareerJobMatch[];
+  umichCareerEvents?: RadarItem[];
+  scholarships?: OpportunityMatch[];
+  businessNews?: OpportunityMatch[];
+  aiNews?: OpportunityMatch[];
+  externalEvents?: OpportunityMatch[];
+  language: "en" | "zh";
+  generatedAt: string;
+  insight: { title: string; detail: string; evidence: string[] };
+  fieldInsight: {
+    title: string;
+    signal: string;
+    implication: string;
+    experiment: string;
+    sources: { label: string; url: string }[];
+  };
+  actions: RadarItem[];
+  forwardedEmails?: RadarItem[];
+  opportunities: RadarItem[];
+  risk: RadarItem | null;
+  canvas: { connected: boolean; eventCount: number; upcoming: RadarItem[] };
+  googleCalendar: { connected: boolean; eventCount: number; upcoming: RadarItem[] };
+  academic: { connected: boolean; courseCount: number; deadlineCount: number; upcoming: RadarItem[] };
+  researchLabs: { enabled: boolean; matches: ResearchLabMatch[]; sourceNote: string };
+  umichSourceMode: "live" | "verified_fallback" | "unavailable";
+  attribution: string;
+};

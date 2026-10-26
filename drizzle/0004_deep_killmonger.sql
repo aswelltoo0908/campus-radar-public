@@ -1,0 +1,1 @@
+ALTER TABLE `profiles` ADD `is_umich_student` integer DEFAULT true NOT NULL;

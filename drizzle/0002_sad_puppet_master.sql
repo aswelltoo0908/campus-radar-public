@@ -1,0 +1,1 @@
+ALTER TABLE `profiles` ADD `report_language` text DEFAULT 'en' NOT NULL;

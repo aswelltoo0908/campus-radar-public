@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin
+Disallow: /beta
+Disallow: /unsubscribe
+Sitemap: https://campus-radar-umich.aswelltoo.chatgpt.site/sitemap.xml

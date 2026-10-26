@@ -1,0 +1,12 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import vm from "node:vm";
+import ts from "typescript";
+const out={},matching={},types={},registry={};
+const compile=path=>ts.transpileModule(readFileSync(new URL(path,import.meta.url),"utf8"),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+vm.runInNewContext(compile("../lib/types.ts"),{exports:types});vm.runInNewContext(compile("../lib/opportunity-matching.ts"),{exports:matching,require:()=>types,URL,Date});vm.runInNewContext(compile("../lib/server/public-source-registry.ts"),{exports:registry});
+vm.runInNewContext(compile("../lib/server/public-intake.ts"),{exports:out,require:name=>name.includes("opportunity-matching")?matching:name.includes("public-source-registry")?registry:name.includes("public-signals")?{plainSourceText:value=>String(value).replace(/<[^>]*>/g,"")}: {},URL,Date});
+const now=new Date("2026-10-14T16:00:00Z"),record={id:"example-funding",category:"scholarship",title:"Public scholarship",summary:"A public program",url:"https://official.example.edu/scholarships",sourceName:"University",fetchedAt:"2026-10-14T15:00:00Z",availability:"open",eligibility:{otherRequirements:["Confirm enrollment"]},evidenceText:"Applications are open."};
+test("intake accepts bounded public evidence with null unknown dates",()=>{const [row]=out.validatePublicIntake([record],now);assert.equal(row.deadline,null);assert.equal(row.publishedAt,null);assert.equal(row.verifiedAt,null);assert.equal(row.sourceMode,"live");});
+test("intake rejects unrelated categories, private URLs, invented date strings and stale checks",()=>{for(const change of [{category:"business_news"},{url:"https://official.example.edu/account/student"},{url:"https://official.example.edu/scholarships?token=private"},{deadline:"soon"},{fetchedAt:"2026-09-01T00:00:00Z"}])assert.throws(()=>out.validatePublicIntake([{...record,...change}],now));});
